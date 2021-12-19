@@ -1,0 +1,37 @@
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+    <Button
+        android:id="@+id/call_user_btn"
+        android:layout_width="140dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="130dp"
+        android:layout_marginBottom="25dp"
+        android:background="@drawable/button_taxicall"
+        android:text="Müşteri Ara"
+        map:layout_constraintBottom_toBottomOf="parent"
+        map:layout_constraintStart_toStartOf="parent" />
+
+    <fragment
+        android:id="@+id/map2"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="690dp"
+        map:layout_constraintEnd_toEndOf="parent"
+        map:layout_constraintHorizontal_bias="0.0"
+        map:layout_constraintStart_toStartOf="parent"
+        map:layout_constraintTop_toTopOf="parent"
+        tools:context=".MapsActivity2" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="230dp"
+        android:background="@drawable/bottom_dark_new"
+        map:layout_constraintBottom_toBottomOf="parent"
+        tools:layout_editor_absoluteX="158dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
