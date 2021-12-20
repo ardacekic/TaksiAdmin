@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
@@ -71,6 +72,7 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -88,6 +90,7 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
                 Clicked_to_marker = true;
                 //TODO: YEŞİL YANIP SÖNEN BİŞİ YAP Kİ ANLAYALIM TAKSİYİ İSTİYOZ >> TAKSİ ÇAĞIR BUTONUNU
                 //TODO: TAKSİ SİMGESİNİ Bİ TIK BÜYÜTEBİLİRİZ HER TIKLANANA
+                //TODO: TAKSİCİDE GÖRÜNEN MARKER SİLİNECEK
                 String markerTitle = marker.getTitle();
                 Clicked_Taxi = markerTitle;
                 popClicled();
@@ -105,16 +108,16 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
                 .setPositiveButton("Evet", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                            StatusforUser="2";
-                            sendUserRequestResult();
-                            getDAfuckingWay();
+                        StatusforUser="2";
+                        sendUserRequestResult();
+                        getDAfuckingWay();
                     }
                 })
                 .setNegativeButton("Hayır", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                            StatusforUser="3";
-                            sendUserRequestResult();
+                        StatusforUser="3";
+                        sendUserRequestResult();
                     }
                 })
                 .show();
@@ -192,8 +195,8 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
             if (!sending){
                 doesSomebodyWantMe();
                 sending= true;
-                //startTimer();
-                //startSendingLocation();
+                startTimer();
+                startSendingLocation();
             }else{
                 sending = false;
                 stopTimer();
@@ -210,6 +213,7 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
     private void startTimer() {
         new CountDownTimer(10000, 1000){
             public void onTick(long millisUntilFinished){
+
                 doesSomebodyWantMe();
             }
             public  void onFinish(){
