@@ -44,4 +44,7 @@ dependencies {
     implementation 'com.budiyev.android:code-scanner:2.1.0'
     def nav_version = "2.3.5"
     implementation "com.airbnb.android:lottie:3.4.0"
+    implementation 'com.google.code.gson:gson:2.8.8'
+    implementation 'com.github.jd-alexander:library:1.1.0'
+
 }
