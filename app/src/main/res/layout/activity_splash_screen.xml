@@ -18,7 +18,7 @@
             app:lottie_rawRes="@raw/giris_taksi_anim"
             app:lottie_autoPlay="true"
             app:lottie_loop="true"
-            android:background="@color/A"
+            android:background="@color/GreenGo"
 
             />
 

@@ -16,6 +16,7 @@ import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -29,6 +30,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -49,8 +52,9 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
     public Long time;
     protected LocationListener locationListener;
     private Button call_user;
-    private boolean sending = false;
+    private boolean sending,received_user = false;
     private boolean Clicked_to_marker = false;
+    private TextView durum_txtview;
     String Clicked_Taxi = "";
     String userLat="";
     String userLon="";
@@ -59,13 +63,14 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
     UserData u = new UserData();
     LatLng user_latlng;
     LatLng taksi_latlng;
+    String def_valid = "1";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps2);
         call_user = findViewById(R.id.call_user_btn);
         call_user.setOnClickListener(this);
-
+        durum_txtview=findViewById(R.id.durum_txtview);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map2);
@@ -80,7 +85,7 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
             return;
         }
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
-        mMap.setMyLocationEnabled(true);
+        mMap.setMyLocationEnabled(false);
         locationManager = (LocationManager) getSystemService(this.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         mMap.animateCamera( CameraUpdateFactory.zoomTo( 15.0f ) );
@@ -180,30 +185,49 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
         time = (location.getTime());
         mMap.animateCamera( CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15.0f) );
         taksi_latlng = new LatLng(latitude, longitude);
-        /*
+
         mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                .title("Taksi"));
+                .title("Taksi")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_yellow))
+                .anchor((float) 0.5, (float) 0.5));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
-         */
+
     }
     @Override
     public void onClick(View v) {
         if(v == call_user){;
             Log.i("click","clicked");
             //TODO LOGIN HANDSHAKE WILL BE HERE
+            changeDAimagesToGreen();
             if (!sending){
-                doesSomebodyWantMe();
+                changeDAimagesToGreen();
                 sending= true;
                 startTimer();
                 startSendingLocation();
             }else{
+                changeDAimagesToRed();
                 sending = false;
                 stopTimer();
-                stopSendingLocation();
+                //stopSendingLocation();
             }
 
         }
+    }
+
+    private void changeDAimagesToRed() {
+        durum_txtview.setText("Çevrim Dışısın ");
+        durum_txtview.setTextColor(getResources().getColor(R.color.RedAlert));
+        call_user.setText("ARA");
+        call_user.setBackgroundResource(R.drawable.button_ara);
+
+    }
+
+    private void changeDAimagesToGreen() {
+        durum_txtview.setText("Çevrim içisin ");
+        durum_txtview.setTextColor(getResources().getColor(R.color.GreenGo));
+        call_user.setText("DUR");
+        call_user.setBackgroundResource(R.drawable.button_dur);
     }
 
     private void stopTimer() {
@@ -213,12 +237,15 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
     private void startTimer() {
         new CountDownTimer(10000, 1000){
             public void onTick(long millisUntilFinished){
+                if(!received_user){
+                    doesSomebodyWantMe();
+                }
 
-                doesSomebodyWantMe();
             }
             public  void onFinish(){
-                startSendingLocation();
+
                 if(sending){
+                    startSendingLocation();
                     startTimer();
                 }else{
                     //STOP
@@ -237,10 +264,19 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
                     JSONObject jsonObject = new JSONObject(response);
                     //todo : false olarak kontrol et önce
                     String message = jsonObject.getString("message");
-                    userLat= jsonObject.getJSONArray("message").getJSONObject(0).getString("lat");
-                    userLon= jsonObject.getJSONArray("message").getJSONObject(0).getString("lon");
-                    Time_user_req = jsonObject.getJSONArray("message").getJSONObject(0).getString("time");
-                    updateMapWithUserMarker();
+                    Log.d("message_info3",message);
+                    if ((message.equals("false"))){
+                        def_valid = "0";
+                        userLat= jsonObject.getJSONArray("message").getJSONObject(0).getString("lat");
+                        userLon= jsonObject.getJSONArray("message").getJSONObject(0).getString("lon");
+                        Time_user_req = jsonObject.getJSONArray("message").getJSONObject(0).getString("time");
+                        updateMapWithUserMarker();
+                        Log.d("message_info",message);
+                        received_user = true;
+                    }else{
+                        def_valid = "1";
+                    }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -263,51 +299,11 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
     }
 
     private void updateMapWithUserMarker() {
+        //mMap.clear();
         LatLng first = new LatLng(Double.valueOf(userLat), Double.valueOf(userLon));
         Marker m = mMap.addMarker(new MarkerOptions().position(first).title("Take Me!"));
         Log.d("taksi_idea",userLat + " " + userLon);
     }
-
-    private void stopSendingLocation() {
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, Constants.URL_TaksiRegisterData, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try{
-                    JSONObject jsonObject = new JSONObject(response);
-                    String message  = jsonObject.getString("error");
-                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-                    if(message.equals("false")){
-
-                    }else{
-
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.i("error","psam error");
-                Log.i("error2",error.toString());
-            }
-        }){
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> params = new HashMap<>();
-                params.put("username","HakanÇolak");
-                params.put("lat",latitude.toString());
-                params.put("lon",longitude.toString());
-                params.put("time",time.toString());
-                params.put("valid","1");
-                return params;
-            }
-        };
-        RequestHandler.getInstance(this).addToRequestQueue(stringRequest);
-    }
-
-
 
     private void startSendingLocation() {
         Log.i("loginuser",Constants.URL_LOGIN);
@@ -341,7 +337,7 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
                 params.put("lat",latitude.toString());
                 params.put("lon",longitude.toString());
                 params.put("time",time.toString());
-                params.put("valid","1");
+                params.put("valid",def_valid);
                 return params;
             }
         };

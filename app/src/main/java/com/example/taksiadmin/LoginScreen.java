@@ -31,7 +31,7 @@ import java.util.Map;
 
 
 public class LoginScreen extends Activity implements View.OnClickListener {
-    private Button login_button,signin_button,deneme,qr_btn;
+    private Button login_button,bypass,signin_button,deneme,qr_btn;
     private EditText username_text,password_text;
 
     private static final int MY_CAMERA_REQUEST_CODE = 100;
@@ -47,8 +47,14 @@ public class LoginScreen extends Activity implements View.OnClickListener {
         login_button = findViewById(R.id.login_button);
         login_button.setOnClickListener(this);
 
-        signin_button = findViewById(R.id.signin_button);
-        signin_button.setOnClickListener(this);
+        //TUYGAN BYPASSS
+        bypass = findViewById(R.id.bypass);
+        bypass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(LoginScreen.this,MapsActivity2.class));
+            }
+        });
 
         username_text = findViewById(R.id.username_text);
         password_text = findViewById(R.id.password_text);

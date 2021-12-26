@@ -9,5 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="A">#3185fc</color>
     <color name="DarkMain">#1d3a63</color>
-    <color name="RedAlert">#A70E12</color>
+    <color name="RedAlert">#DF2F45</color>
+    <color name="GreenGo">#58BE3F</color>
+    <color name="Gray">#7F7F7F</color>
 </resources>
